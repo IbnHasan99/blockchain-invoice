@@ -3,9 +3,15 @@ import cookieParser from "cookie-parser";
 import "dotenv/config"
 import express from "express";
 import morgan from "morgan";
+import connnectionToDB from "./config/connectDB.js";
 import {morganMiddleware, systemLogs} from "./utils/Logger.js";
+import mongoSanitize from "express-mongo-sanitize";
+import {errorHandler, notFound} from "./middleware/errorMiddleware.js"
+import authRoutes from "./routes/authRoutes.js"
 
 
+
+await connnectionToDB();
 const app = express();
 
 if (process.env.NODE_ENV === 'development') {
@@ -15,13 +21,18 @@ if (process.env.NODE_ENV === 'development') {
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
-
+app.use(mongoSanitize());
 app.use(morganMiddleware);
 
 
 app.get("/api/v1/test", (req, res)=>{
     res.json({Hi : "Welcome"});
 })
+
+app.use("/api/v1/auth", authRoutes);
+
+app.use(notFound);
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 1997;
 
