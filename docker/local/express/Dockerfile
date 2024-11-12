@@ -15,6 +15,8 @@ WORKDIR ${APP_HOME}
 RUN addgroup --system blockchain-invoice
 RUN adduser --system --ingroup blockchain-invoice myuser
 
+RUN apk --update add ttf-freefont fontconfig && rm -rf /var/cache/apk/*
+
 COPY package*.json ./
 
 RUN npm install
